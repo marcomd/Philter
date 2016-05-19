@@ -1,4 +1,5 @@
 class Array
+  include Philter::Base
   def philter search=nil, options={}
     options = {
         get:          nil,
@@ -24,7 +25,7 @@ class Array
        puts help if options[:debug]
        raise "Specify search parameter!"
     end
-
+    default_operator = '=='
     results = []
     self.each do |item|
        puts "item #{item.class.name} #{item}"                               if options[:debug]
@@ -47,9 +48,14 @@ class Array
                    print "| #{item.send(label)} =~ #{value}"                if options[:debug]
                    selected = item.send(label) =~ value
                  else
-                   print " .2 #{item.class.name}.#{label} == value "        if options[:debug]
-                   print "| #{item.send(label)} == #{value}"                if options[:debug]
-                   selected = item.send(label) == value
+                   # search: {id: 2}
+                   # search: {id: '<3'} or any other operator
+                   operator   = get_operator value
+                   tmp_value  = operator ? value.gsub(operator,'').to_i : value
+                   operator ||= default_operator
+                   print " .2 #{item.class.name}.#{label} #{operator} value " if options[:debug]
+                   print "| #{item.send(label)} #{operator} #{tmp_value}"     if options[:debug]
+                   selected = eval("item.send(label) #{operator} tmp_value")
                  end
                elsif item.respond_to? '[]'
                  print "  1.y label: #{label.class.name}"                   if options[:debug]
@@ -60,9 +66,13 @@ class Array
                    selected = value === item[label].to_s
                  elsif item.is_a?(Hash) && !label.is_a?(Fixnum)
                    # search: {id: 1} or {'name' => 'Mark'}
-                   print " .2 #{item.class.name}[:#{label}] == value "      if options[:debug]
-                   print "| #{item[label]} == #{value}"                     if options[:debug]
-                   selected = item[label] == value
+                   # search: {id: '<3'} or any other operator
+                   operator   = get_operator value
+                   tmp_value  = operator ? value.gsub(operator,'').to_i : value
+                   operator ||= default_operator
+                   print " .2 #{item.class.name}[:#{label}] #{operator} value " if options[:debug]
+                   print "| #{item[label]} #{operator} #{tmp_value}"            if options[:debug]
+                   selected = eval("item[label] #{operator} tmp_value")
                  else
                    print " .3 no action for #{value} !!!"                   if options[:debug]
                  end
@@ -99,9 +109,13 @@ class Array
        else
          # Search has one item
          # search: 3 or search: 'a'
-         print " c. item == search "                                        if options[:debug]
-         print "| #{item} == #{search}"                                     if options[:debug]
-         selected = item == search
+         # search: '<3' or any other operator
+         operator   = get_operator search
+         tmp_search = operator ? search.gsub(operator,'').to_i : search
+         operator ||= default_operator
+         print " c. item #{operator} search "                               if options[:debug]
+         print "| #{item} #{operator} #{tmp_search}"                        if options[:debug]
+         selected = eval("item #{operator} tmp_search")
          puts "  #{'=> X' if selected}"                                     if options[:debug]
          condition[:at_least_one] ||= selected
        end

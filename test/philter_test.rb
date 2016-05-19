@@ -20,13 +20,40 @@ class PhilterTest < Test::Unit::TestCase
   test 'philter fixnums' do
     search = 2
     res = get_array_of_fixnums.philter search
-    assert res == [search],                   "Searching #{search} in #{get_array_of_fixnums} result should be [#{search}]"
+    assert res == [search],                   "Searching #{search} in #{get_array_of_fixnums} result should be [#{search}], not #{res}"
   end
 
   test 'philter fixnums by an array of fixnums' do
     search = [2, 3]
     res = get_array_of_fixnums.philter search
-    assert res == search,                     "Searching #{search} in #{get_array_of_fixnums} result should be #{search}"
+    assert res == search,                     "Searching #{search} in #{get_array_of_fixnums} result should be #{search}, not #{res}"
+  end
+
+  test 'philter fixnums with operators' do
+    search    = '>2'
+    should_be = [3, 4, 5]
+    res = get_array_of_fixnums.philter search
+    assert res == should_be,                  "Searching #{search} in #{get_array_of_fixnums} result should be #{should_be}, not #{res}"
+
+    search    = '< 3'
+    should_be = [1, 2]
+    res = get_array_of_fixnums.philter search
+    assert res == should_be,                  "Searching #{search} in #{get_array_of_fixnums} result should be #{should_be}, not #{res}"
+
+    search    = '<= 1'
+    should_be = [1]
+    res = get_array_of_fixnums.philter search
+    assert res == should_be,                  "Searching #{search} in #{get_array_of_fixnums} result should be #{should_be}, not #{res}"
+
+    search    = '>= 2'
+    should_be = [2, 3, 4, 5]
+    res = get_array_of_fixnums.philter search
+    assert res == should_be,                  "Searching #{search} in #{get_array_of_fixnums} result should be #{should_be}, not #{res}"
+
+    search    = '!= 3'
+    should_be = [1, 2, 4, 5]
+    res = get_array_of_fixnums.philter search
+    assert res == should_be,                  "Searching #{search} in #{get_array_of_fixnums} result should be #{should_be}, not #{res}"
   end
 
   #################
@@ -84,6 +111,22 @@ class PhilterTest < Test::Unit::TestCase
 
   test 'philter hashes by array of Fixnum return multiple results' do
     search = [1, 2]
+    res = get_array_with_hashes.philter id: search
+    assert res.size == search.size,           "Should return #{search.size} item, not #{res.size}"
+
+    bol_hash = true
+    res.each{|item| bol_hash = item.is_a?(Hash) unless bol_hash }
+    assert bol_hash,                          "Every item should be an Hash, not a #{res.first.class.name}"
+
+    check_names = %w(Larry Bill)
+    res.each do |item|
+      assert check_names.include?(item[:name]), "Person #{item[:name]} should not be present, only #{check_names.join(', ')}"
+    end
+  end
+
+
+  test 'philter hashes by Fixnum with operators' do
+    search = '<3'
     res = get_array_with_hashes.philter id: search
     assert res.size == search.size,           "Should return #{search.size} item, not #{res.size}"
 
@@ -164,6 +207,21 @@ class PhilterTest < Test::Unit::TestCase
 
   test 'philter objects by array of Fixnum return multiple results' do
     search = [1, 2]
+    res = get_array_with_objects.philter id: search
+    assert res.size == search.size,           "Should return #{search.size} item, not #{res.size}"
+
+    bol_hash = true
+    res.each{|item| bol_hash = item.is_a?(Person) unless bol_hash }
+    assert bol_hash,                          "Every item should be an Person, not a #{res.first.class.name}"
+
+    check_names = %w(Larry Bill)
+    res.each do |item|
+      assert check_names.include?(item.name), "Person #{item.name} should not be present, only #{check_names.join(', ')}"
+    end
+  end
+
+  test 'philter objects by Fixnum with operators' do
+    search = '<3'
     res = get_array_with_objects.philter id: search
     assert res.size == search.size,           "Should return #{search.size} item, not #{res.size}"
 

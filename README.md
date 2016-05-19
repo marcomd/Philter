@@ -41,6 +41,13 @@ require 'philter'
 ].philter id: [1,3]
 => [{:id=>1, :name=>"Mark"}, {:id=>3, :name=>"Bill"}]
 
+[
+{id: 1, name: 'Mark'    },
+{id: 2, name: 'Larry'   },
+{id: 3, name: 'Bill'    }
+].philter id: '>2'
+=> [{:id=>3, :name=>"Bill"}]
+
 # Regular expression
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
