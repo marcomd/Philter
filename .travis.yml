@@ -9,6 +9,4 @@ rvm:
 env:
   - CI_ENV=default
 script:
-  - git config --global user.email "test@philter.com"
-  - git config --global user.name "Test User"
-  - rake philter:tests:all
+  - bundle exec ruby test/philter_test.rb

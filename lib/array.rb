@@ -107,10 +107,10 @@ class Array
        end
        if condition[:at_least_one] || condition[:all]
           tmp_result = if options[:get]
-            item.respond_to?(options[:get]) ? item.send(options[:get]) : item[options[:get]]
-          else
-            item
-          end
+                         item.respond_to?(options[:get]) ? item.send(options[:get]) : item[options[:get]]
+                       else
+                         item
+                       end
           results << tmp_result
         end
     end

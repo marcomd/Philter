@@ -28,7 +28,6 @@ require 'philter'
 => ["red", "blue"]
 
 # Array of hashes
-
 [
 {id: 1, name: 'Mark'    },
 {id: 2, name: 'Larry'   }
@@ -49,6 +48,37 @@ require 'philter'
 {id: 3, name: 'Bill',   email: 'bill@live.com'    }
 ].philter email: /@gmail/
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}, {:id=>2, :name=>"Larry",:email=>"larry@gmail.com"}]
+
+# Select attributes
+[
+{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
+{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
+{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+].philter({email: /@gmail/}, get: :name)
+=> ["Mark", "Larry"]
+
+# Debug mode
+[
+{id: 1, name: 'Mark'    },
+{id: 2, name: 'Larry'   },
+{id: 3, name: 'Bill'    }
+].philter({id: [1,3]}, debug: true)
+
+item Hash {:id=>1, :name=>"Mark"}
+ a. search: Array [:id, [1, 3]]
+  1.y label: Symbol .2 Hash[:id] == value | 1 == 1  => X
+  1.y label: Symbol .2 Hash[:id] == value | 1 == 3
+item Hash {:id=>2, :name=>"Larry"}
+ a. search: Array [:id, [1, 3]]
+  1.y label: Symbol .2 Hash[:id] == value | 2 == 1
+  1.y label: Symbol .2 Hash[:id] == value | 2 == 3
+item Hash {:id=>3, :name=>"Bill"}
+ a. search: Array [:id, [1, 3]]
+  1.y label: Symbol .2 Hash[:id] == value | 3 == 1
+  1.y label: Symbol .2 Hash[:id] == value | 3 == 3  => X
+------------------
+ 2 items found
+=> [{:id=>1, :name=>"Mark"}, {:id=>3, :name=>"Bill"}]
 ```
 
 ### Rails

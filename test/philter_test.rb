@@ -71,7 +71,15 @@ class PhilterTest < Test::Unit::TestCase
     assert res.size         == 1,             "Should return one item, not #{res.size}"
     assert res.first.is_a?(Hash),             "The item is an Hash"
     assert res.first[:id]   == 1,             "Should return the hash ##{search}"
-    assert res.first[:name] == 'Larry',       "Should return the hash with name='Larry'"
+    assert res.first[:name] == 'Larry',       "The name of id #{search} should be Larry"
+  end
+
+  test 'philter hashes by Fixnum can return only an attribute' do
+    search = 1
+    res = get_array_with_hashes.philter({id: search}, get: :name)
+    assert res.size         == 1,             "Should return one item, not #{res.size}"
+    assert res.first.is_a?(String),           "The item should be the selected attribute (String), not a #{res.first.class.name}"
+    assert res.first        == 'Larry',       "The name of id #{search} should be Larry"
   end
 
   test 'philter hashes by array of Fixnum return multiple results' do
@@ -86,6 +94,21 @@ class PhilterTest < Test::Unit::TestCase
     check_names = %w(Larry Bill)
     res.each do |item|
       assert check_names.include?(item[:name]), "Person #{item[:name]} should not be present, only #{check_names.join(', ')}"
+    end
+  end
+
+  test 'philter hashes by array of Fixnum can return multiple attributes' do
+    search = [1, 2]
+    res = get_array_with_hashes.philter({id: search}, get: :name)
+    assert res.size == search.size,           "Should return #{search.size} item, not #{res.size}"
+
+    bol_hash = true
+    res.each{|item| bol_hash = item.is_a?(String) unless bol_hash }
+    assert bol_hash,                          "Every item should be the selected attribute (String), not a #{res.first.class.name}"
+
+    check_names = %w(Larry Bill)
+    res.each do |item|
+      assert check_names.include?(item), "Person #{item} should not be present, only #{check_names.join(', ')}"
     end
   end
 
@@ -136,7 +159,7 @@ class PhilterTest < Test::Unit::TestCase
     assert res.size         == 1,             "Should return one item, not #{res.size}"
     assert res.first.is_a?(Person),           "The item is an Person"
     assert res.first.id     == 1,             "Should return the Person ##{search}"
-    assert res.first.name   == 'Larry',       "Should return the Person with name='Larry'"
+    assert res.first.name   == 'Larry',       "The name of id #{search} should be Larry"
   end
 
   test 'philter objects by array of Fixnum return multiple results' do
