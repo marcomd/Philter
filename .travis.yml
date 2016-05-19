@@ -1,0 +1,14 @@
+language: ruby
+install:
+  - bundle install --path=mybundle
+rvm:
+  - 1.9.3
+  - 2.1.7
+  - 2.2.4
+  - 2.3.0
+env:
+  - CI_ENV=default
+script:
+  - git config --global user.email "test@philter.com"
+  - git config --global user.name "Test User"
+  - rake philter:tests:all
