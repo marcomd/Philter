@@ -1,3 +1,7 @@
+v0.4.0 [☰](https://github.com/marcomd/Philter/compare/v0.3.0...v0.4.0) May 23th, 2016
+------------------------------
+* Improved code quality
+
 v0.3.0 [☰](https://github.com/marcomd/Philter/compare/v0.2.0...v0.3.0) May 19th, 2016
 ------------------------------
 * Added operators to work with fixnum: id: '<3' or any other operator

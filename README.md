@@ -3,8 +3,8 @@
 ### Sometimes it help you to filter some arrays
 
 [![Version     ](https://badge.fury.io/rb/philter.svg)                        ](https://rubygems.org/gems/philter)
-[![Travis CI   ](http://img.shields.io/travis/marcomd/philter/master.svg)     ](https://travis-ci.org/marcomd/philter)
-[![Quality     ](http://img.shields.io/codeclimate/github/marcomd/philter.svg)](https://codeclimate.com/github/marcomd/philter)
+[![Travis CI   ](http://img.shields.io/travis/marcomd/Philter/master.svg)     ](https://travis-ci.org/marcomd/philter)
+[![Quality     ](http://img.shields.io/codeclimate/github/marcomd/Philter.svg)](https://codeclimate.com/github/marcomd/philter)
 
 This gem let you to filter any kind of arrays to get the item or attributes of selected items
 

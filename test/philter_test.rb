@@ -3,6 +3,11 @@ require "./lib/philter"
 
 class PhilterTest < Test::Unit::TestCase
 
+  test 'without search param should raise exception' do
+    exception = assert_raises(RuntimeError) { [1].philter() }
+    assert_equal( "Specify search parameter!", exception.message )
+  end
+
   test 'philter an array should return an array' do
     res = [1].philter 1
     assert res.is_a?(Array),                  "The result should be an array"

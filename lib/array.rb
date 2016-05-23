@@ -5,36 +5,19 @@ class Array
         get:          nil,
         debug:        false
     }.merge(options)
-    help = <<-HELP.gsub(/^      /, '')
-      *************************************************************************
-      [].philter 'search', {options}
-      Examples:
-      [1,2,3].philter 1 => [1]
-      [1,2,3].philter [2,3] => [2, 3]
-      [{id: 1, name: 'Mark'},{id: 2, name: 'Bill'}].philter id: 1
-      Articles.philter id: 1
-      People.philter   name: 'Mario'
-      People.philter   email: /\A.+@gmail/
-      Use option get: to select an attribute
-      People.philter   {id: 1}, get: :surname
-      Use option debug: to watch the selection
-      Articles.philter {id: 1}, debug: true
-      *************************************************************************
-    HELP
     unless search
-       puts help if options[:debug]
+       puts philter_help if options[:debug]
        raise "Specify search parameter!"
     end
-    default_operator = '=='
     results = []
     self.each do |item|
-       puts "item #{item.class.name} #{item}"                               if options[:debug]
-       condition = {all: nil, at_least_one: nil}
+       puts "item #{item.class.name} #{item}"                                 if options[:debug]
+       h_selected = {all: nil, at_least_one: nil}
        if search.respond_to? :each
          # search: {} or []
          search.each do |value|
            # Every item must match with search options to be selected
-           puts " a. search: #{value.class.name} #{value}"                  if options[:debug]
+           puts " a. search: #{value.class.name} #{value}"                    if options[:debug]
            if value.is_a?(Array)
              # Example search: {code: 1} or search: {code: [1,2]}
              label, values = value
@@ -42,84 +25,67 @@ class Array
              values.each do |value|
                selected = nil
                if item.respond_to?(label)
-                 print "  1.x " if options[:debug]
+                 print "  1.x "                                               if options[:debug]
                  if value.is_a?(Regexp)
-                   print " .1 #{item.class.name}.#{label} =~ value "        if options[:debug]
-                   print "| #{item.send(label)} =~ #{value}"                if options[:debug]
-                   selected = item.send(label) =~ value
+                   print " .1 "                                               if options[:debug]
+                   selected = phil_evaluate item, label, value, :method, options.merge(operator: '=~')
                  else
                    # search: {id: 2}
                    # search: {id: '<3'} or any other operator
-                   operator   = get_operator value
-                   tmp_value  = operator ? value.gsub(operator,'').to_i : value
-                   operator ||= default_operator
-                   print " .2 #{item.class.name}.#{label} #{operator} value " if options[:debug]
-                   print "| #{item.send(label)} #{operator} #{tmp_value}"     if options[:debug]
-                   selected = eval("item.send(label) #{operator} tmp_value")
+                   print " .2 " if options[:debug]
+                   selected = phil_evaluate item, label, value, :method, options.merge(operator: '==')
                  end
                elsif item.respond_to? '[]'
-                 print "  1.y label: #{label.class.name}"                   if options[:debug]
+                 print "  1.y label: #{label.class.name}"                     if options[:debug]
                  if value.is_a?(Regexp)
                    # search: {email: /@gmail/}
-                   print " .1 value === item "                              if options[:debug]
-                   print "| #{value} === '#{item[label]}'"                  if options[:debug]
-                   selected = value === item[label].to_s
+                   print " .1 "                                               if options[:debug]
+                   selected = phil_evaluate item, label, value, :hash, options.merge(operator: '=~')
                  elsif item.is_a?(Hash) && !label.is_a?(Fixnum)
                    # search: {id: 1} or {'name' => 'Mark'}
                    # search: {id: '<3'} or any other operator
-                   operator   = get_operator value
-                   tmp_value  = operator ? value.gsub(operator,'').to_i : value
-                   operator ||= default_operator
-                   print " .2 #{item.class.name}[:#{label}] #{operator} value " if options[:debug]
-                   print "| #{item[label]} #{operator} #{tmp_value}"            if options[:debug]
-                   selected = eval("item[label] #{operator} tmp_value")
+                   print " .2 " if options[:debug]
+                   selected = phil_evaluate item, label, value, :hash, options.merge(operator: '==')
                  else
-                   print " .3 no action for #{value} !!!"                   if options[:debug]
+                   print " .3 no action for #{value} !!!"                       if options[:debug]
                  end
                else
-                 print "  1.z selector not present !!!"                     if options[:debug]
+                 print "  1.z selector not present !!!"                         if options[:debug]
                end
-               puts "  #{'=> X' if selected}"                               if options[:debug]
-               condition[:at_least_one] ||= selected
+               puts "  #{'=> X' if selected}"                                   if options[:debug]
+               h_selected[:at_least_one] ||= selected
              end
            elsif value.is_a?(Regexp)
              # search: {email: /@gmail/}
-             print "   2. value === item "                                  if options[:debug]
-             print " | #{value} === '#{item}'"                              if options[:debug]
-             selected = value === item.to_s
+             print "   2. "                                                   if options[:debug]
+             selected = phil_evaluate item, nil, value, :simple, options.merge(operator: '=~')
              puts "  #{'=> X' if selected}"                                 if options[:debug]
-             condition[:at_least_one] ||= selected
+             h_selected[:at_least_one] ||= selected
            else
              # Example search: [3] or search: [3, 4]
-             print "   3. item == value "                                   if options[:debug]
-             print "| #{item} == #{value}"                                  if options[:debug]
-             selected = item == value
+             print "   3. "                                                 if options[:debug]
+             selected = phil_evaluate item, nil, value, :simple, options.merge(operator: '==')
              puts "  #{'=> X' if selected}"                                 if options[:debug]
-             condition[:at_least_one] ||= selected
+             h_selected[:at_least_one] ||= selected
            end
          end
        elsif search.is_a?(Regexp)
          # Search has one item
          # search: 3 or search: 'a'
-         print " b. search === item "                                       if options[:debug]
-         print " | #{search} === '#{item}'"                                 if options[:debug]
-         selected = search === item.to_s
+         print " b.  "                                                      if options[:debug]
+         selected = phil_evaluate item, nil, search, :simple, options.merge(operator: '=~')
          puts "  #{'=> X' if selected}"                                     if options[:debug]
-         condition[:at_least_one] ||= selected
+         h_selected[:at_least_one] ||= selected
        else
          # Search has one item
          # search: 3 or search: 'a'
          # search: '<3' or any other operator
-         operator   = get_operator search
-         tmp_search = operator ? search.gsub(operator,'').to_i : search
-         operator ||= default_operator
-         print " c. item #{operator} search "                               if options[:debug]
-         print "| #{item} #{operator} #{tmp_search}"                        if options[:debug]
-         selected = eval("item #{operator} tmp_search")
+         print " c.  "                                                      if options[:debug]
+         selected = phil_evaluate item, nil, search, :simple, options.merge(operator: '==')
          puts "  #{'=> X' if selected}"                                     if options[:debug]
-         condition[:at_least_one] ||= selected
+         h_selected[:at_least_one] ||= selected
        end
-       if condition[:at_least_one] || condition[:all]
+       if h_selected[:at_least_one] || h_selected[:all]
           tmp_result = if options[:get]
                          item.respond_to?(options[:get]) ? item.send(options[:get]) : item[options[:get]]
                        else
@@ -131,21 +97,5 @@ class Array
     puts "------------------"                                               if options[:debug]
     puts " #{results ? results.size : 'No'} item#{results && results.size == 1 ? '' : 's'} found" if options[:debug]
     results
-  end
-
-  def phelect arg_fields
-    fields = arg_fields.split(',').flatten if arg_fields.respond_to?('split')
-    self.map do |item|
-      record = {}
-      fields.each do |field|
-        if item.respond_to?(field)
-          record[field.to_sym] = item.send field
-        elsif item.respond_to?'[]'
-          record[field.to_sym] = (item[field] || item[field.to_sym])
-        else
-          # How do i get the data ?
-        end
-      end
-    end
   end
 end
