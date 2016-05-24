@@ -14,7 +14,7 @@ class Array
       puts "item #{item.class.name} #{item}"                               if options[:debug]
       if search.respond_to? :each
         # search: {} or []
-        selected = search_from_list search, item, options
+        selected = phil_search_from_list search, item, options
       elsif search.is_a?(Regexp)
         # Search has one item
         # search: 3 or search: 'a'

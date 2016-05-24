@@ -6,7 +6,10 @@
 [![Travis CI   ](http://img.shields.io/travis/marcomd/Philter/master.svg)     ](https://travis-ci.org/marcomd/Philter)
 [![Quality     ](http://img.shields.io/codeclimate/github/marcomd/Philter.svg)](https://codeclimate.com/github/marcomd/Philter)
 
-This gem let you to filter any kind of arrays to get the item or attributes of selected items
+This gem let you to filter any kind of arrays to get the item or attributes of selected items.
+It's short and dynamic which helps to increase the readability.
+Its trace is a usefull tool for teachers.
+Performance it's not its field, see the section below.
 
 
 ![](/assets/logo.png)
@@ -71,7 +74,7 @@ require 'philter'
 => ["Mark", "Larry"]
 ```
 
-Debug mode
+Get the trace with the option `debug: true`
 
 ```ruby
 [
@@ -118,53 +121,62 @@ cities.philter(region: /\Alomb/i).size
 
 ## Performance
 
-If you need speed you should use grep o select manually your items.
+If you need a lot of speed it would be better to use grep when you can or select manually your items.
 
 ```ruby
-start = Time.now
-puts "Starting at #{start}"
-10_000.times do |n|
-  [0, 1, 2, 3, 4, 5].philter [1,2]
+require 'benchmark'
+
+ar_test = 100.times.map{|n| n}
+Benchmark.bmbm do |x|
+  x.report("philter: ") { 1_000.times { ar_test.philter [1,2] } }
+  x.report("grep: ")    { 1_000.times { ar_test.grep [1,2] } }
 end
-puts "Finish in #{Time.now-start} second(s)"
-puts
+
+Rehearsal ---------------------------------------------
+philter:    1.872000   0.000000   1.872000 (  1.859130)
+grep:       0.031000   0.000000   0.031000 (  0.017170)
+------------------------------------ total: 1.903000sec
+
+                user     system      total        real
+philter:    1.826000   0.000000   1.826000 (  1.834825)
+grep:       0.016000   0.000000   0.016000 (  0.016777)
 ```
-Finish in `1.219809` second(s)
 
 ```ruby
-start = Time.now
-puts "Starting at #{start}"
-10_000.times do |n|
-  [0, 1, 2, 3, 4, 5].grep [1,2]
+Benchmark.bmbm do |x|
+  x.report("philter: ") { 1_000.times { ar_test.philter '< 50' } }
+  x.report("select: ")  { 1_000.times { ar_test.select {|item| item < 50} } }
 end
-puts "Finish in #{Time.now-start} second(s)"
-puts
-```
-Finish in `0.095601` second(s)
 
+Rehearsal ---------------------------------------------
+philter:    3.775000   0.000000   3.775000 (  3.779718)
+select:     0.000000   0.000000   0.000000 (  0.004455)
+------------------------------------ total: 3.775000sec
+
+                user     system      total        real
+philter:    3.744000   0.000000   3.744000 (  3.746851)
+select:     0.016000   0.000000   0.016000 (  0.004338)
+```
 
 ```ruby
-start = Time.now
-puts "Starting at #{start}"
-10_000.times do |n|
-  [0, 1, 2, 3, 4, 5].philter '<4'
+ar_test = [ {id: 1, name: 'Mark', email: 'mark@gmail.com'},
+            {id: 2, name: 'Bill',  email: 'bill@live.com'},
+            {id: 3, name: 'Larry', email: 'larry@gmail.com'}]
+regexp = /\A.+gmail/
+Benchmark.bmbm do |x|
+  x.report("philter: ") { 10_000.times { ar_test.philter email: regexp } }
+  x.report("select: ")  { 10_000.times { ar_test.select {|item| item[:email] =~ regexp} } }
 end
-puts "Finish in #{Time.now-start} second(s)"
-puts
-```
-Finish in `2.373617` second(s)
 
-```ruby
-start = Time.now
-puts "Starting at #{start}"
-10_000.times do |n|
-  [0, 1, 2, 3, 4, 5].select {|item| item < 4}
-end
-puts "Finish in #{Time.now-start} second(s)"
-puts
-```
-Finish in `0.1248` second(s)
+Rehearsal ---------------------------------------------
+philter:    0.515000   0.000000   0.515000 (  0.490562)
+select:     0.000000   0.000000   0.000000 (  0.003961)
+------------------------------------ total: 0.515000sec
 
+                user     system      total        real
+philter:    0.468000   0.000000   0.468000 (  0.473782)
+select:     0.000000   0.000000   0.000000 (  0.003429)
+```
 
 ## Compatibility
 

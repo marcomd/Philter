@@ -1,3 +1,8 @@
+v0.6.0 [☰](https://github.com/marcomd/Philter/compare/v0.5.0...v0.6.0) May 24th, 2016
+------------------------------
+* Improved code readability
+* Improved documentation
+
 v0.5.0 [☰](https://github.com/marcomd/Philter/compare/v0.4.0...v0.5.0) May 24th, 2016
 ------------------------------
 * Improved code readability
