@@ -9,4 +9,5 @@ rvm:
 env:
   - CI_ENV=default
 script:
-  - bundle exec ruby test/philter_test.rb
+  - bundle exec ruby test/unit_test.rb
+  - bundle exec ruby test/performance_test.rb 4.5

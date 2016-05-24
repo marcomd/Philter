@@ -203,9 +203,21 @@ To use it in a rails project, add to gem file `gem 'philter'` and run `bundle in
 
 ## Testing
 
+To test locally install the development requirements
+
     bundle install
-    
-    bundle exec ruby test\philter_test.rb
+
+Then execute
+
+    bundle exec ruby test\unit_test.rb
+
+Performance tests are calibrated to not exceed 1.2 seconds on my pc with a tolerance become 2 seconds:
+
+    bundle exec ruby test\performance_test.rb
+
+If you have a very slow pc it could not pass. In this case you can pass as an argument a higher tolerance value, for example 3 seconds:
+
+    bundle exec ruby test\performance_test.rb 3.0
 
 ## Found a bug?
 

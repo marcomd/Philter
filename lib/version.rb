@@ -1,5 +1,5 @@
 module Philter
   def self.version
-    "0.6.0"
+    "0.7.0"
   end
 end
