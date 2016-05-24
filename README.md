@@ -21,6 +21,12 @@ require 'philter'
 [1,2,3].philter [2,3]
 => [2,3]
 
+[1,2,3].philter '<= 2'
+=> [1,2]
+
+[1,2,3].philter '!= 2'
+=> [1,3]
+
 %w[red green blue].philter 'red'
 => ["red"]
 
@@ -63,14 +69,17 @@ require 'philter'
 {id: 3, name: 'Bill',   email: 'bill@live.com'    }
 ].philter({email: /@gmail/}, get: :name)
 => ["Mark", "Larry"]
+```
 
-# Debug mode
+Debug mode
+
+```ruby
 [
 {id: 1, name: 'Mark'    },
 {id: 2, name: 'Larry'   },
 {id: 3, name: 'Bill'    }
 ].philter({id: [1,3]}, debug: true)
-
+# You will get a trace
 item Hash {:id=>1, :name=>"Mark"}
  a. search: Array [:id, [1, 3]]
   1.y label: Symbol .2 Hash[:id] == value | 1 == 1  => X
@@ -107,6 +116,56 @@ cities.philter(region: /\Alomb/i).size
 => 4
 ```
 
+## Performance
+
+If you need speed you should use grep o select manually your items.
+
+```ruby
+start = Time.now
+puts "Starting at #{start}"
+10_000.times do |n|
+  [0, 1, 2, 3, 4, 5].philter [1,2]
+end
+puts "Finish in #{Time.now-start} second(s)"
+puts
+```
+Finish in `1.219809` second(s)
+
+```ruby
+start = Time.now
+puts "Starting at #{start}"
+10_000.times do |n|
+  [0, 1, 2, 3, 4, 5].grep [1,2]
+end
+puts "Finish in #{Time.now-start} second(s)"
+puts
+```
+Finish in `0.095601` second(s)
+
+
+```ruby
+start = Time.now
+puts "Starting at #{start}"
+10_000.times do |n|
+  [0, 1, 2, 3, 4, 5].philter '<4'
+end
+puts "Finish in #{Time.now-start} second(s)"
+puts
+```
+Finish in `2.373617` second(s)
+
+```ruby
+start = Time.now
+puts "Starting at #{start}"
+10_000.times do |n|
+  [0, 1, 2, 3, 4, 5].select {|item| item < 4}
+end
+puts "Finish in #{Time.now-start} second(s)"
+puts
+```
+Finish in `0.1248` second(s)
+
+
 ## Compatibility
 
 Ruby `1.9+`
@@ -116,6 +175,11 @@ Ruby `1.9+`
     gem install philter
 
 To use it in a rails project, add to gem file `gem 'philter'` and run `bundle install`
+
+## To Do
+
+* Add boolean operator to chain of conditions
+* Improve performance keeping the operations's trace
 
 ## Contributing
 

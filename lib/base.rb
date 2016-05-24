@@ -57,5 +57,66 @@ module Philter
           raise "phil_evaluate: evaluation #{evaluation ? "#{evaluation} not valid!" : "blank!"}"
       end
     end
+
+    # Search params respond to each method
+    def search_from_list search, item, options={}
+      selected_or, selected_and = nil, nil
+      search.each do |value|
+        # Every item must match with search options to be selected
+        puts " a. search: #{value.class.name} #{value}"                    if options[:debug]
+        if value.is_a?(Array)
+          # Example search: {code: 1} or search: {code: [1,2]}
+          label, values = value
+          values = [values] unless values.is_a?(Array)
+          values.each do |value|
+            selected = nil
+            if item.respond_to?(label)
+              print "  1.x "                                               if options[:debug]
+              if value.is_a?(Regexp)
+                print " .1 "                                               if options[:debug]
+                selected = phil_evaluate item, label, value, :method, options.merge(operator: '=~')
+              else
+                # search: {id: 2}
+                # search: {id: '<3'} or any other operator
+                print " .2 " if options[:debug]
+                selected = phil_evaluate item, label, value, :method, options.merge(operator: '==')
+              end
+            elsif item.respond_to? '[]'
+              print "  1.y label: #{label.class.name}"                     if options[:debug]
+              if value.is_a?(Regexp)
+                # search: {email: /@gmail/}
+                print " .1 "                                               if options[:debug]
+                selected = phil_evaluate item, label, value, :hash, options.merge(operator: '=~')
+              elsif item.is_a?(Hash) && !label.is_a?(Fixnum)
+                # search: {id: 1} or {'name' => 'Mark'}
+                # search: {id: '<3'} or any other operator
+                print " .2 " if options[:debug]
+                selected = phil_evaluate item, label, value, :hash, options.merge(operator: '==')
+              else
+                print " .3 no action for #{value} !!!"                     if options[:debug]
+              end
+            else
+              print "  1.z selector not present !!!"                       if options[:debug]
+            end
+            puts "  #{'=> X' if selected}"                                 if options[:debug]
+            selected_or   = true      if !selected_or && selected
+            selected_and  = selected  if selected_and
+          end
+        elsif value.is_a?(Regexp)
+          # search: {email: /@gmail/}
+          print "   2. "                                                   if options[:debug]
+          selected = phil_evaluate item, nil, value, :simple, options.merge(operator: '=~')
+          puts "  #{'=> X' if selected}"                                   if options[:debug]
+        else
+          # Example search: [3] or search: [3, 4]
+          print "   3. "                                                   if options[:debug]
+          selected = phil_evaluate item, nil, value, :simple, options.merge(operator: '==')
+          puts "  #{'=> X' if selected}"                                   if options[:debug]
+        end
+        selected_or   = true      if !selected_or && selected
+        selected_and  = selected  if selected_and
+      end
+      selected_or
+    end
   end
 end
