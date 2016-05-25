@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "lib", "version")
 Gem::Specification.new do |s|
   s.name          = "philter"
   s.version       = Philter.version
-  s.date          = "2016-05-24"
+  s.date          = "2016-05-25"
   s.summary       = "Filter arrays with pleasure"
   s.description   = "This gem let you to filter any kind of arrays to get the item or attributes of selected items"
   s.homepage      = "https://github.com/marcomd/philter"

@@ -20,11 +20,13 @@ def get_array_of_symbols
 end
 
 def get_array_of_hybrids
-  hash1   = {id: 1, tag: :first}
-  hash2   = {id: 2, tag: :second}
-  custom1 = Employee.new id: 3, tag: 'third'
-  custom2 = Employee.new id: 4, tag: 'fourth'
-  [0, 1, 2, 'a', 'b', 'c', :first, :second, :third, hash1, hash2, custom1, custom2]
+  hash1     = {id: 1, tag: :first}
+  hash2     = {id: 2, tag: :second}
+  employee1 = Employee.new id: 3, tag: 'third'
+  employee2 = Employee.new id: 4, tag: 'fourth'
+  customer1 = Customer.new id: 5, tag: :fifth
+  customer2 = Customer.new id: 6, tag: :sixth
+  [0, 1, 2, 'a', 'b', 'c', :first, :second, :third, hash1, hash2, employee1, employee2, customer1, customer2]
 end
 
 def get_array_with_hashes

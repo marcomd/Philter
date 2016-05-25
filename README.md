@@ -36,6 +36,10 @@ require 'philter'
 %w[red green blue].philter %w(red blue)
 => ["red", "blue"]
 
+# You can pass a block
+[1,2,3].philter([1,2]){|e|e*2}
+=> [2, 4]
+
 # Array of hashes
 [
 {id: 1, name: 'Mark'    },
@@ -72,6 +76,39 @@ require 'philter'
 {id: 3, name: 'Bill',   email: 'bill@live.com'    }
 ].philter({email: /@gmail/}, get: :name)
 => ["Mark", "Larry"]
+
+# Philter with more attributes
+[
+{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
+{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
+{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+].philter name: /M.+/, email: /@gmail/
+=> [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}]
+
+# Philter with an attribute or another
+[
+{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
+{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
+{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+].philter({name: /M.+/, email: /@live/}, or: true)
+=> [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}, {:id=>3, :name=>"Bill", :email=>"bill@live.com"}]
+
+# A bit of magic
+# Select and update attributes
+[
+{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
+{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
+{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+].philter({email: /@gmail/}){|e| e[:name] << ' use gmail!'}
+=> ["Mark use gmail!", "Larry use gmail!"]
+
+# Add attributes
+[
+{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
+{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
+{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+].philter({email: /@gmail/}){|e| e[:surname] = 'unknown';e }
+=> :try_yourself
 ```
 
 Get the trace with the option `debug: true`
@@ -115,31 +152,73 @@ cities.philter id: 1
 cities.philter code: 'PA'
 => [#<City id: 4, name: "Palermo", code: "PA", region: "Sicilia", created_at: "2016-05-10 09:08:13", updated_at: "2016-05-10 09:08:13">]
 
-cities.philter(region: /\Alomb/i).size
-=> 4
+# Pass a block to select, update or change the result
+cities.philter(region: /\Alomb/i){|city| "#{city.name}-#{city.code}"}
+=> ["Milano-MI", "Lecco-LC", "Pavia-PV", "Piacenza-PC"]
+
 ```
 
 ## Performance
 
-If you need a lot of speed it would be better to use grep when you can or select manually your items.
+Since version `1.0.0` performance are greatly improved!
+Ruby 2.2.3p173 on windows 7 with i5 3570K Ivy Bridge @4200 Mhz Ram 16Gb 10-10-10-27 2T @686Mhz
 
 ```ruby
 require 'benchmark'
+require 'philter'
 
 ar_test = 100.times.map{|n| n}
 Benchmark.bmbm do |x|
-  x.report("philter: ") { 1_000.times { ar_test.philter [1,2] } }
-  x.report("grep: ")    { 1_000.times { ar_test.grep [1,2] } }
+  x.report("philter: ") { 10_000.times { ar_test.philter 1 } }
+  x.report("grep: ")    { 10_000.times { ar_test.grep    1 } }
 end
 
-Rehearsal ---------------------------------------------
-philter:    1.872000   0.000000   1.872000 (  1.859130)
-grep:       0.031000   0.000000   0.031000 (  0.017170)
------------------------------------- total: 1.903000sec
-
+#version 1.0.0
                 user     system      total        real
-philter:    1.826000   0.000000   1.826000 (  1.834825)
-grep:       0.016000   0.000000   0.016000 (  0.016777)
+philter:    0.031000   0.000000   0.031000 (  0.021759)
+grep:       0.016000   0.000000   0.016000 (  0.007115)
+
+#version 0.7.0
+                user     system      total        real
+philter:    9.204000   0.000000   9.204000 (  9.254443)
+grep:       0.062000   0.000000   0.062000 (  0.054257)
+```
+
+```ruby
+range = 1..10
+Benchmark.bmbm do |x|
+  x.report("philter: ") { 10_000.times { ar_test.philter range  } }
+  x.report("grep: ")    { 10_000.times { ar_test.grep    range  } }
+end
+
+#version 1.0.0
+                user     system      total        real
+philter:    0.015000   0.000000   0.015000 (  0.023891)
+grep:       0.000000   0.000000   0.000000 (  0.009134)
+
+#version 0.7.0
+=> Range was not managed
+                user     system      total        real
+philter:   91.136000   0.000000  91.136000 ( 91.305855)
+grep:       0.172000   0.000000   0.172000 (  0.182490)
+```
+
+```ruby
+ar_search = [1,3,5,7]
+Benchmark.bmbm do |x|
+  x.report("philter: ") { 10_000.times { ar_test.philter ar_search } }
+  x.report("select: ")  { 10_000.times { ar_test.select{|item| ar_search.include? item } } }
+end
+
+#version 1.0.0
+                user     system      total        real
+philter:    0.062000   0.000000   0.062000 (  0.052933)
+select:     0.031000   0.000000   0.031000 (  0.022178)
+
+#version 0.7.0
+                user     system      total        real
+philter:   36.176000   0.000000  36.176000 ( 36.182101)
+select:     0.078000   0.000000   0.078000 (  0.073341)
 ```
 
 ```ruby
@@ -148,31 +227,33 @@ Benchmark.bmbm do |x|
   x.report("select: ")  { 1_000.times { ar_test.select {|item| item < 50} } }
 end
 
-Rehearsal ---------------------------------------------
-philter:    3.775000   0.000000   3.775000 (  3.779718)
-select:     0.000000   0.000000   0.000000 (  0.004455)
------------------------------------- total: 3.775000sec
+#version 1.0.0
+                user     system      total        real
+philter:    2.855000   0.000000   2.855000 (  2.851040)
+select:     0.015000   0.000000   0.015000 (  0.004312)
 
+#version 0.7.0
                 user     system      total        real
 philter:    3.744000   0.000000   3.744000 (  3.746851)
 select:     0.016000   0.000000   0.016000 (  0.004338)
 ```
 
 ```ruby
-ar_test = [ {id: 1, name: 'Mark', email: 'mark@gmail.com'},
-            {id: 2, name: 'Bill',  email: 'bill@live.com'},
-            {id: 3, name: 'Larry', email: 'larry@gmail.com'}]
+ar_test = [ {id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+            {id: 2, name: 'Bill',  email: 'bill@live.com'   },
+            {id: 3, name: 'Larry', email: 'larry@gmail.com' }]
 regexp = /\A.+gmail/
 Benchmark.bmbm do |x|
   x.report("philter: ") { 10_000.times { ar_test.philter email: regexp } }
   x.report("select: ")  { 10_000.times { ar_test.select {|item| item[:email] =~ regexp} } }
 end
 
-Rehearsal ---------------------------------------------
-philter:    0.515000   0.000000   0.515000 (  0.490562)
-select:     0.000000   0.000000   0.000000 (  0.003961)
------------------------------------- total: 0.515000sec
+#version 1.0.0
+                user     system      total        real
+philter:    0.218000   0.000000   0.218000 (  0.221822)
+select:     0.000000   0.000000   0.000000 (  0.003418)
 
+#version 0.7.0
                 user     system      total        real
 philter:    0.468000   0.000000   0.468000 (  0.473782)
 select:     0.000000   0.000000   0.000000 (  0.003429)
@@ -186,12 +267,14 @@ Ruby `1.9+`
 
     gem install philter
 
-To use it in a rails project, add to gem file `gem 'philter'` and run `bundle install`
+To use it in a bundle, add to gem file `gem 'philter'` and run `bundle install`
 
 ## To Do
 
-* Add boolean operator to chain of conditions
-* Improve performance keeping the operations's trace
+- [x] Add boolean operator to chain of conditions `v1.0.0`
+- [x] Improve performance keeping the operations's trace `v1.0.0`
+- [x] Add block `v1.0.0`
+- [ ] Increase performance further
 
 ## Contributing
 
@@ -202,6 +285,8 @@ To use it in a rails project, add to gem file `gem 'philter'` and run `bundle in
 5. Create new Pull Request
 
 ## Testing
+
+Wide coverage with `37 unit tests` and `137 assertions`
 
 To test locally install the development requirements
 
@@ -215,7 +300,22 @@ Performance tests are calibrated to not exceed 1.2 seconds on my pc with a toler
 
     bundle exec ruby test\performance_test.rb
 
-If you have a very slow pc it could not pass. In this case you can pass as an argument a higher tolerance value, for example 3 seconds:
+```
+Loaded suite test/performance_test
+Started
+........
+
+Finished in 8.505 seconds.
+--------------------------------------------------------------------------------
+
+8 tests, 8 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+100% passed
+--------------------------------------------------------------------------------
+
+0.94 tests/s, 0.94 assertions/s
+```
+
+If you have a very slow pc it could not pass. In this case you can pass a higher tolerance value as argument, for example 3 seconds:
 
     bundle exec ruby test\performance_test.rb 3.0
 
