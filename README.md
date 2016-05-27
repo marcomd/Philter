@@ -37,87 +37,88 @@ require 'philter'
 => ["red", "blue"]
 
 # You can pass a block
-[1,2,3].philter([1,2]){|e|e*2}
+[1,2,3].philter([1,2]) { |e| e*2 }
 => [2, 4]
 
 # Array of hashes
 [
-{id: 1, name: 'Mark'    },
-{id: 2, name: 'Larry'   }
+  { id: 1, name: 'Mark'  },
+  { id: 2, name: 'Larry' }
 ].philter id: 1
 => [{:id=>1, :name=>"Mark"}]
 
 [
-{id: 1, name: 'Mark'    },
-{id: 2, name: 'Larry'   },
-{id: 3, name: 'Bill'    }
+  { id: 1, name: 'Mark'  },
+  { id: 2, name: 'Larry' },
+  { id: 3, name: 'Bill'  }
 ].philter id: [1,3]
 => [{:id=>1, :name=>"Mark"}, {:id=>3, :name=>"Bill"}]
 
 [
-{id: 1, name: 'Mark'    },
-{id: 2, name: 'Larry'   },
-{id: 3, name: 'Bill'    }
+  { id: 1, name: 'Mark'  },
+  { id: 2, name: 'Larry' },
+  { id: 3, name: 'Bill'  }
 ].philter id: '>2'
 => [{:id=>3, :name=>"Bill"}]
 
 # Regular expression
 [
-{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
-{id: 3, name: 'Bill',   email: 'bill@live.com'   }
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Larry', email: 'larry@gmail.com' },
+  { id: 3, name: 'Bill',  email: 'bill@live.com'   }
 ].philter email: /@gmail/
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}, {:id=>2, :name=>"Larry",:email=>"larry@gmail.com"}]
 
 # Select attributes
 [
-{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
-{id: 3, name: 'Bill',   email: 'bill@live.com'   }
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Larry', email: 'larry@gmail.com' },
+  { id: 3, name: 'Bill',  email: 'bill@live.com'   }
 ].philter({email: /@gmail/}, get: :name)
 => ["Mark", "Larry"]
 
 # Philter with more attributes -and-
 [
-{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
-{id: 3, name: 'Bill',   email: 'bill@live.com'   }
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Larry', email: 'larry@gmail.com' },
+  { id: 3, name: 'Bill',  email: 'bill@live.com'   }
 ].philter name: /M.+/, email: /@gmail/
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}]
 
 # Philter with more attributes -or-
 [
-{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
-{id: 3, name: 'Bill',   email: 'bill@live.com'   }
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Larry', email: 'larry@gmail.com' },
+  { id: 3, name: 'Bill',  email: 'bill@live.com'   }
 ].philter({name: /M.+/, email: /@live/}, or: true)
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}, {:id=>3, :name=>"Bill", :email=>"bill@live.com"}]
 
 # A bit of magic
 # Select and update attributes
 [
-{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
-{id: 3, name: 'Bill',   email: 'bill@live.com'   }
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Larry', email: 'larry@gmail.com' },
+  { id: 3, name: 'Bill',  email: 'bill@live.com'   }
 ].philter({email: /@gmail/}){|e| e[:name] << ' use gmail!'}
 => ["Mark use gmail!", "Larry use gmail!"]
 
 # Add attributes
 [
-{id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
-{id: 3, name: 'Bill',   email: 'bill@live.com'   }
-].philter({email: /@gmail/}){|e| e[:surname] = 'unknown';e }
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Larry', email: 'larry@gmail.com' },
+  { id: 3, name: 'Bill',  email: 'bill@live.com'   }
+].philter({email: /@gmail/}){ |e| e[:surname] = 'unknown'; e }
 => :try_yourself
 ```
 
 Get the trace with the option `debug: true`
 
 ```ruby
-[{id: 1, name: 'Mark', email: 'mark@gmail.com'},
- {id: 2, name: 'Bill', email: 'bill@live.com'},
- {id: 3, name: 'Larry', email: 'larry@gmail.com'}
-].philter({name: 'Mark', email: /\A.+gmail/}, debug: true)
+[
+  { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+  { id: 2, name: 'Bill',  email: 'bill@live.com'   },
+  { id: 3, name: 'Larry', email: 'larry@gmail.com' }
+].philter({ name: 'Mark', email: /\A.+gmail/ }, debug: true)
 
 --------------- Start debugging philter 1.1.0 ---------------
  Search by Hash:
@@ -166,7 +167,7 @@ cities.philter code: 'PA'
 => [#<City id: 4, name: "Palermo", code: "PA", region: "Sicilia", created_at: "2016-05-10 09:08:13", updated_at: "2016-05-10 09:08:13">]
 
 # Pass a block to select, update or change the result
-cities.philter(region: /\Alomb/i){|city| "#{city.name}-#{city.code}"}
+cities.philter(region: /\Alomb/i) { |city| "#{city.name}-#{city.code}" }
 => ["Milano-MI", "Lecco-LC", "Pavia-PV", "Piacenza-PC"]
 
 ```
@@ -180,7 +181,7 @@ Ruby 2.2.3p173 on windows 7 with i5 3570K Ivy Bridge @4200 Mhz Ram 16Gb 10-10-10
 require 'benchmark'
 require 'philter'
 
-ar_test = 100.times.map{|n| n}
+ar_test = 100.times.map { |n| n }
 Benchmark.bmbm do |x|
   x.report("philter: ") { 10_000.times { ar_test.philter 1 } }
   x.report("grep: ")    { 10_000.times { ar_test.grep    1 } }
@@ -220,7 +221,7 @@ grep:       0.172000   0.000000   0.172000 (  0.182490)
 ar_search = [1,3,5,7]
 Benchmark.bmbm do |x|
   x.report("philter: ") { 10_000.times { ar_test.philter ar_search } }
-  x.report("select: ")  { 10_000.times { ar_test.select{|item| ar_search.include? item } } }
+  x.report("select: ")  { 10_000.times { ar_test.select { |item| ar_search.include?(item) } } }
 end
 
 #version 1.0.0
@@ -236,8 +237,8 @@ select:     0.078000   0.000000   0.078000 (  0.073341)
 
 ```ruby
 Benchmark.bmbm do |x|
-  x.report("philter: ") { 1_000.times { ar_test.philter '< 50'          } }
-  x.report("select: ")  { 1_000.times { ar_test.select {|item| item < 50} } }
+  x.report("philter: ") { 1_000.times { ar_test.philter '< 50'            } }
+  x.report("select: ")  { 1_000.times { ar_test.select { |item| item < 50 } } }
 end
 
 #version 1.0.0
@@ -252,13 +253,13 @@ select:     0.016000   0.000000   0.016000 (  0.004338)
 ```
 
 ```ruby
-ar_test = [ {id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
-            {id: 2, name: 'Bill',  email: 'bill@live.com'   },
-            {id: 3, name: 'Larry', email: 'larry@gmail.com' }]
+ar_test = [ { id: 1, name: 'Mark',  email: 'mark@gmail.com'  },
+            { id: 2, name: 'Bill',  email: 'bill@live.com'   },
+            { id: 3, name: 'Larry', email: 'larry@gmail.com' }]
 regexp = /\A.+gmail/
 Benchmark.bmbm do |x|
   x.report("philter: ") { 10_000.times { ar_test.philter email: regexp } }
-  x.report("select: ")  { 10_000.times { ar_test.select {|item| item[:email] =~ regexp} } }
+  x.report("select: ")  { 10_000.times { ar_test.select { |item| item[:email] =~ regexp } } }
 end
 
 #version 1.0.0
@@ -299,7 +300,7 @@ To use it in a bundle, add to gem file `gem 'philter'` and run `bundle install`
 
 ## Testing
 
-Wide coverage with `37 unit tests` and `137 assertions`
+Wide coverage with `38 unit tests` and `143 assertions`
 
 To test locally install the development requirements
 
