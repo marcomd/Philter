@@ -1,3 +1,10 @@
+v1.1.0 [☰](https://github.com/marcomd/Philter/compare/v1.0.0...v1.1.0) May 26th, 2016
+------------------------------
+* Added debug mode to unit tests
+* Changed files organization
+* Improved code readibility
+* Improved documentation
+
 v1.0.0 [☰](https://github.com/marcomd/Philter/compare/v0.8.0...v1.0.0) May 25th, 2016
 ------------------------------
 * Code revolution: more simple, secure and readable

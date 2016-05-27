@@ -64,32 +64,32 @@ require 'philter'
 # Regular expression
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
-{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
+{id: 3, name: 'Bill',   email: 'bill@live.com'   }
 ].philter email: /@gmail/
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}, {:id=>2, :name=>"Larry",:email=>"larry@gmail.com"}]
 
 # Select attributes
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
-{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
+{id: 3, name: 'Bill',   email: 'bill@live.com'   }
 ].philter({email: /@gmail/}, get: :name)
 => ["Mark", "Larry"]
 
-# Philter with more attributes
+# Philter with more attributes -and-
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
-{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
+{id: 3, name: 'Bill',   email: 'bill@live.com'   }
 ].philter name: /M.+/, email: /@gmail/
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}]
 
-# Philter with an attribute or another
+# Philter with more attributes -or-
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
-{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
+{id: 3, name: 'Bill',   email: 'bill@live.com'   }
 ].philter({name: /M.+/, email: /@live/}, or: true)
 => [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}, {:id=>3, :name=>"Bill", :email=>"bill@live.com"}]
 
@@ -97,16 +97,16 @@ require 'philter'
 # Select and update attributes
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
-{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
+{id: 3, name: 'Bill',   email: 'bill@live.com'   }
 ].philter({email: /@gmail/}){|e| e[:name] << ' use gmail!'}
 => ["Mark use gmail!", "Larry use gmail!"]
 
 # Add attributes
 [
 {id: 1, name: 'Mark',   email: 'mark@gmail.com'  },
-{id: 2, name: 'Larry',  email: 'larry@gmail.com'   },
-{id: 3, name: 'Bill',   email: 'bill@live.com'    }
+{id: 2, name: 'Larry',  email: 'larry@gmail.com' },
+{id: 3, name: 'Bill',   email: 'bill@live.com'   }
 ].philter({email: /@gmail/}){|e| e[:surname] = 'unknown';e }
 => :try_yourself
 ```
@@ -114,27 +114,40 @@ require 'philter'
 Get the trace with the option `debug: true`
 
 ```ruby
-[
-{id: 1, name: 'Mark'    },
-{id: 2, name: 'Larry'   },
-{id: 3, name: 'Bill'    }
-].philter({id: [1,3]}, debug: true)
-# You will get a trace
-item Hash {:id=>1, :name=>"Mark"}
- a. search: Array [:id, [1, 3]]
-  1.y label: Symbol .2 Hash[:id] == value | 1 == 1  => X
-  1.y label: Symbol .2 Hash[:id] == value | 1 == 3
-item Hash {:id=>2, :name=>"Larry"}
- a. search: Array [:id, [1, 3]]
-  1.y label: Symbol .2 Hash[:id] == value | 2 == 1
-  1.y label: Symbol .2 Hash[:id] == value | 2 == 3
-item Hash {:id=>3, :name=>"Bill"}
- a. search: Array [:id, [1, 3]]
-  1.y label: Symbol .2 Hash[:id] == value | 3 == 1
-  1.y label: Symbol .2 Hash[:id] == value | 3 == 3  => X
-------------------
- 2 items found
-=> [{:id=>1, :name=>"Mark"}, {:id=>3, :name=>"Bill"}]
+[{id: 1, name: 'Mark', email: 'mark@gmail.com'},
+ {id: 2, name: 'Bill', email: 'bill@live.com'},
+ {id: 3, name: 'Larry', email: 'larry@gmail.com'}
+].philter({name: 'Mark', email: /\A.+gmail/}, debug: true)
+
+--------------- Start debugging philter 1.1.0 ---------------
+ Search by Hash:
+
+ item {:id=>1, :name=>"Mark", :email=>"mark@gmail.com"} (Hash)
+  evaluating with hash
+   search: name: Mark (String)
+   .4  v1 item[name]  item == value | Mark == Mark  => x
+   search: email: (?-mix:\A.+gmail) (Regexp)
+   .1  v1 item[email]  item =~ value | mark@gmail.com =~ (?-mix:\A.+gmail)  => x
+
+ - SELECTED - (And)
+
+ item {:id=>2, :name=>"Bill", :email=>"bill@live.com"} (Hash)
+  evaluating with hash
+   search: name: Mark (String)
+   .4  v1 item[name]  item == value | Bill == Mark
+   search: email: (?-mix:\A.+gmail) (Regexp)
+   .1  v1 item[email]  item =~ value | bill@live.com =~ (?-mix:\A.+gmail)
+
+ item {:id=>3, :name=>"Larry", :email=>"larry@gmail.com"} (Hash)
+  evaluating with hash
+   search: name: Mark (String)
+   .4  v1 item[name]  item == value | Larry == Mark
+   search: email: (?-mix:\A.+gmail) (Regexp)
+   .1  v1 item[email]  item =~ value | larry@gmail.com =~ (?-mix:\A.+gmail)  => x
+
+--------------- End debugging philter 1.1.0 ---------------
+ 1 item(s) found
+=> [{:id=>1, :name=>"Mark", :email=>"mark@gmail.com"}]
 ```
 
 ### Rails
@@ -223,7 +236,7 @@ select:     0.078000   0.000000   0.078000 (  0.073341)
 
 ```ruby
 Benchmark.bmbm do |x|
-  x.report("philter: ") { 1_000.times { ar_test.philter '< 50' } }
+  x.report("philter: ") { 1_000.times { ar_test.philter '< 50'          } }
   x.report("select: ")  { 1_000.times { ar_test.select {|item| item < 50} } }
 end
 

@@ -479,24 +479,24 @@ class UnitTest < Test::Unit::TestCase
   test 'philter hybrids with an array of values' do
     search = [0, 'a', :first]
     res = get_array_of_hybrids.philter search
-    assert res == search,                     "Searching #{search} in #{get_array_of_hybrids} result should be #{search}"
+    assert res == search,                     "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
 
     res = get_array_of_hybrids.philter id: [1, 2]
-    assert res.size         == 2,             "Should return 2 items"
-    assert res.first.is_a?(Hash),             "The item is an Hash"
-    assert res.first[:tag]  == :first,        "Should return the hash with tag=:first"
+    assert res.size         == 2,             "Should return 2 items, not #{res.size}"
+    assert res.first.is_a?(Hash),             "The item is an Hash, not #{res.first.class.name}"
+    assert res.first[:tag]  == :first,        "Should return the hash with tag=:first, not #{res.first}"
 
     res = get_array_of_hybrids.philter id: [3, 4]
-    assert res.size         == 2,             "Should return 2 items"
-    assert res.first.is_a?(Employee), "The item is a Employee"
-    assert res.first.tag    == 'third',       "Should return the hash with tag='third'"
+    assert res.size         == 2,             "Should return 2 items, not #{res.size}"
+    assert res.first.is_a?(Employee),         "The item is a Employee, not #{res.first.class.name}"
+    assert res.first.tag    == 'third',       "Should return the hash with tag='third', not #{res.first}"
 
     res = get_array_of_hybrids.philter id: [1, 2, 3, 4]
-    assert res.size         == 4,             "Should return 4 items"
-    assert res.first.is_a?(Hash),             "The item is an Hash"
-    assert res.first[:tag]  == :first,        "Should return the hash with tag=:first"
-    assert res.last.is_a?(Employee), "The item is a Employee"
-    assert res.last.tag    == 'fourth',       "Should return the hash with tag='third'"
+    assert res.size         == 4,             "Should return 4 items, not #{res.size}"
+    assert res.first.is_a?(Hash),             "The item is an Hash, not #{res.first.class.name}"
+    assert res.first[:tag]  == :first,        "Should return the hash with tag=:first, not #{}"
+    assert res.last.is_a?(Employee),          "The item is a Employee, not #{res.first.class.name}"
+    assert res.last.tag    == 'fourth',       "Should return the hash with tag='third', not #{res.first}"
   end
 
   test 'philter hybrids with an array of values without some elements' do
@@ -515,4 +515,26 @@ class UnitTest < Test::Unit::TestCase
     assert res.first.tag    == 'third',       "Should return the hash with tag='third'"
   end
 
+  #################
+  ### DEBUG MODE
+  #################
+
+  test 'philter in debug mode' do
+    search    = '< 3'
+    expected_res = [1, 2]
+    res = get_array_of_fixnums.philter search, debug: true
+    assert res == expected_res,               "Searching #{search} in #{get_array_of_fixnums} result should be #{expected_res}, not #{res}"
+
+    res = get_array_with_hashes.philter({email: /\A.+@fca/, name: 'Sergio'}, debug: true)
+    assert res.size == 1,                     "Should return 1 item, not #{res.size}"
+
+    search = [0, 'a', :first]
+    res = get_array_of_hybrids.philter search, debug: true
+    assert res == search,                     "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
+
+    res = get_array_of_hybrids.philter({id: [1, 2]}, debug: true)
+    assert res.size         == 2,             "Should return 2 items, not #{res.size}"
+    assert res.first.is_a?(Hash),             "The item is an Hash, not #{res.first.class.name}"
+    assert res.first[:tag]  == :first,        "Should return the hash with tag=:first, not #{res.first}"
+  end
 end
