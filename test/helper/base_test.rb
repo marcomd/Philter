@@ -19,7 +19,7 @@ def get_array_of_symbols
   [:a,:b,:c,:d,:e]
 end
 
-def get_array_of_hybrids
+def get_array_of_complex_hybrids
   hash1     = {id: 1, tag: :first}
   hash2     = {id: 2, tag: :second}
   employee1 = Employee.new id: 3, tag: 'third'
@@ -29,9 +29,20 @@ def get_array_of_hybrids
   [0, 1, 2, 'a', 'b', 'c', :first, :second, :third, hash1, hash2, employee1, employee2, customer1, customer2]
 end
 
+def get_array_of_simple_hybrids
+   [  :apple,
+      { id: 1, color: :red },
+      :lemon,
+      {id: 2, color: :yellow},
+      :pear,
+      {id: 3, color: :green},
+      :blueberry,
+      {id: 4, color: :blue, size: '1'}
+   ]
+end
+
 def get_array_with_hashes
-  [
-      {id: 1, name: 'Larry', email: 'larry@gmail.com'},
+  [   {id: 1, name: 'Larry', email: 'larry@gmail.com'},
       {id: 2, name: 'Bill',  email: 'bill@live.com'},
       {id: 3, name: 'Jerry', email: 'jarry@yahoo.com'},
       {id: 4, name: 'Tim',   email: 'tim@me.com'},

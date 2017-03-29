@@ -1,3 +1,8 @@
+v1.2.0 [☰](https://github.com/marcomd/Philter/compare/v1.1.0...v1.2.0) March 29th, 2017
+------------------------------
+* Fixed the behaviour when passed a "get" argument to get an attribute which is also an item attribute. For example: with "get: :size" was returned the size of the item but if that item had an attribute "size" you want to get that attribute in the most cases so now it takes precedence.
+  This is not considered a bug so i released a new version.
+
 v1.1.0 [☰](https://github.com/marcomd/Philter/compare/v1.0.0...v1.1.0) May 26th, 2016
 ------------------------------
 * Added debug mode to unit tests

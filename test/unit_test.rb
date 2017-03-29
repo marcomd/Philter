@@ -121,7 +121,7 @@ class UnitTest < Test::Unit::TestCase
     search = 1
     res = get_array_with_hashes.philter id: search
     assert res.size         == 1,             "Should return one item, not #{res.size}"
-    assert res.first.is_a?(Hash),             "The item is an Hash"
+    assert res.first.is_a?(Hash),             "The item should be an Hash"
     assert res.first[:id]   == 1,             "Should return the hash ##{search}"
     assert res.first[:name] == 'Larry',       "The name of id #{search} should be Larry"
   end
@@ -179,7 +179,7 @@ class UnitTest < Test::Unit::TestCase
   test 'philter hashes by string' do
     res = get_array_with_hashes.philter name: 'Larry'
     assert res.size         == 1,             "Should return one item, not #{res.size}"
-    assert res.first.is_a?(Hash),             "The item is an Hash"
+    assert res.first.is_a?(Hash),             "The item should be an Hash"
     assert res.first[:id]   == 1,             "Should return the hash #1"
     assert res.first[:name] == 'Larry',       "Should return the hash with name='Larry'"
   end
@@ -233,7 +233,7 @@ class UnitTest < Test::Unit::TestCase
     search = 1
     res = get_array_with_objects.philter id: search
     assert res.size         == 1,             "Should return one item, not #{res.size}"
-    assert res.first.is_a?(Person),           "The item is an Person"
+    assert res.first.is_a?(Person),           "The item should be a Person"
     assert res.first.id     == 1,             "Should return the Person ##{search}"
     assert res.first.name   == 'Larry',       "The name of id #{search} should be Larry"
   end
@@ -245,7 +245,7 @@ class UnitTest < Test::Unit::TestCase
 
     bol_hash = true
     res.each{|item| bol_hash = item.is_a?(Person) unless bol_hash }
-    assert bol_hash,                          "Every item should be an Person, not a #{res.first.class.name}"
+    assert bol_hash,                          "Every item should be a Person, not a #{res.first.class.name}"
 
     check_names = %w(Larry Bill)
     res.each do |item|
@@ -260,7 +260,7 @@ class UnitTest < Test::Unit::TestCase
 
     bol_hash = true
     res.each{|item| bol_hash = item.is_a?(Person) unless bol_hash }
-    assert bol_hash,                          "Every item should be an Person, not a #{res.first.class.name}"
+    assert bol_hash,                          "Every item should be a Person, not a #{res.first.class.name}"
 
     check_names = %w(Larry Bill)
     res.each do |item|
@@ -271,7 +271,7 @@ class UnitTest < Test::Unit::TestCase
   test 'philter objects by string' do
     res = get_array_with_objects.philter name: 'Larry'
     assert res.size       == 1,               "Should return one item, not #{res.size}"
-    assert res.first.is_a?(Person),           "The item is an Person"
+    assert res.first.is_a?(Person),           "The item should be a Person"
     assert res.first.id   == 1,               "Should return the Person #1"
     assert res.first.name == 'Larry',         "Should return the Person with name='Larry'"
   end
@@ -372,69 +372,69 @@ class UnitTest < Test::Unit::TestCase
 
   test 'philter hybrids' do
     search = 0
-    res = get_array_of_hybrids.philter search
-    assert res == [search],                   "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == [search],                   "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{search}, not #{res}"
 
     search = 'a'
-    res = get_array_of_hybrids.philter search
-    assert res == [search],                   "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == [search],                   "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{search}, not #{res}"
 
     search = :first
-    res = get_array_of_hybrids.philter search
-    assert res == [search],                   "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == [search],                   "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{search}, not #{res}"
 
-    res = get_array_of_hybrids.philter id: 1
+    res = get_array_of_complex_hybrids.philter id: 1
     assert res.size         == 1,             "Should return one item"
-    assert res.first.is_a?(Hash),             "The item is an Hash"
+    assert res.first.is_a?(Hash),             "The item should be an Hash"
     assert res.first[:tag]  == :first,        "Should return the hash with tag=:first"
 
-    res = get_array_of_hybrids.philter id: 3
+    res = get_array_of_complex_hybrids.philter id: 3
     assert res.size         == 1,             "Should return one item"
-    assert res.first.is_a?(Employee), "The item is a Employee"
+    assert res.first.is_a?(Employee), "The item should be an Employee"
     assert res.first.tag    == 'third',       "Should return the hash with tag='third'"
   end
 
   test 'philter hybrids by class' do
     search = Fixnum
     expected_res = [0, 1, 2]
-    res = get_array_of_hybrids.philter search
-    assert res == expected_res,                "Searching #{search} in #{get_array_of_hybrids} result should be #{expected_res}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == expected_res,                "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{expected_res}, not #{res}"
 
     search = String
     expected_res = %w(a b c)
-    res = get_array_of_hybrids.philter search
-    assert res == expected_res,                "Searching #{search} in #{get_array_of_hybrids} result should be #{expected_res}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == expected_res,                "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{expected_res}, not #{res}"
 
     search = Symbol
     expected_res = [:first, :second, :third]
-    res = get_array_of_hybrids.philter search
-    assert res == expected_res,                "Searching #{search} in #{get_array_of_hybrids} result should be #{expected_res}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == expected_res,                "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{expected_res}, not #{res}"
 
     search = Hash
-    expected_res = get_array_of_hybrids.select{|e| e.is_a? search}
-    res = get_array_of_hybrids.philter search
-    assert res == expected_res,                "Searching #{search} in #{get_array_of_hybrids} result should be #{expected_res}, not #{res}"
+    expected_res = get_array_of_complex_hybrids.select{|e| e.is_a? search}
+    res = get_array_of_complex_hybrids.philter search
+    assert res == expected_res,                "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{expected_res}, not #{res}"
 
     search = Employee
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     expected_res = ar.select{|e| e.is_a? search}
     res = ar.philter search
     assert res == expected_res,                "Searching #{search} in #{ar} result should be #{expected_res}, not #{res}"
 
     search = Customer
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     expected_res = ar.select{|e| e.is_a? search}
     res = ar.philter search
     assert res == expected_res,                "Searching #{search} in #{ar} result should be #{expected_res}, not #{res}"
 
     search = [Employee, Customer]
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     expected_res = ar.select{|e| search.include? e.class}
     res = ar.philter search
     assert res == expected_res,                "Searching #{search} in #{ar} result should be #{expected_res}, not #{res}"
 
     search = {tag: Symbol}
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     # Include every object which has the id attribute
     expected_res = ar.select do |e|
       if e.respond_to?(:tag)
@@ -447,7 +447,7 @@ class UnitTest < Test::Unit::TestCase
     assert res == expected_res,                "Searching #{search} in #{ar} result should be #{expected_res}, not #{res}"
 
     search = {tag: String}
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     # Include every object which has the id attribute
     expected_res = ar.select do |e|
       if e.respond_to?(:tag)
@@ -462,7 +462,7 @@ class UnitTest < Test::Unit::TestCase
 
   test 'philter hybrids by array of hybrids' do
     search = [Employee, 1, 'a', :first]
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     expected_res = search
     res = ar.philter search
     assert res == expected_res,                "Searching #{search} in #{ar} result should be #{expected_res}, not #{res}"
@@ -470,7 +470,7 @@ class UnitTest < Test::Unit::TestCase
 
   test 'philter hybrids by symbol everywhere' do
     search = {tag: :first}
-    ar = get_array_of_hybrids
+    ar = get_array_of_complex_hybrids
     expected_res = [:first, {:id=>1, :tag=>:first}]
     res = ar.philter search, everywhere: true
     assert res == expected_res,                "Searching #{search} in #{ar} result should be #{expected_res}, not #{res}"
@@ -478,41 +478,68 @@ class UnitTest < Test::Unit::TestCase
 
   test 'philter hybrids with an array of values' do
     search = [0, 'a', :first]
-    res = get_array_of_hybrids.philter search
-    assert res == search,                     "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == search,                     "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{search}, not #{res}"
 
-    res = get_array_of_hybrids.philter id: [1, 2]
+    res = get_array_of_complex_hybrids.philter id: [1, 2]
     assert res.size         == 2,             "Should return 2 items, not #{res.size}"
-    assert res.first.is_a?(Hash),             "The item is an Hash, not #{res.first.class.name}"
+    assert res.first.is_a?(Hash),             "The item should be an Hash, not #{res.first.class.name}"
     assert res.first[:tag]  == :first,        "Should return the hash with tag=:first, not #{res.first}"
 
-    res = get_array_of_hybrids.philter id: [3, 4]
+    res = get_array_of_complex_hybrids.philter id: [3, 4]
     assert res.size         == 2,             "Should return 2 items, not #{res.size}"
-    assert res.first.is_a?(Employee),         "The item is a Employee, not #{res.first.class.name}"
+    assert res.first.is_a?(Employee),         "The item should be an Employee, not #{res.first.class.name}"
     assert res.first.tag    == 'third',       "Should return the hash with tag='third', not #{res.first}"
 
-    res = get_array_of_hybrids.philter id: [1, 2, 3, 4]
+    res = get_array_of_complex_hybrids.philter id: [1, 2, 3, 4]
     assert res.size         == 4,             "Should return 4 items, not #{res.size}"
-    assert res.first.is_a?(Hash),             "The item is an Hash, not #{res.first.class.name}"
+    assert res.first.is_a?(Hash),             "The item should be an Hash, not #{res.first.class.name}"
     assert res.first[:tag]  == :first,        "Should return the hash with tag=:first, not #{}"
-    assert res.last.is_a?(Employee),          "The item is a Employee, not #{res.first.class.name}"
+    assert res.last.is_a?(Employee),          "The item should be an Employee, not #{res.first.class.name}"
     assert res.last.tag    == 'fourth',       "Should return the hash with tag='third', not #{res.first}"
   end
 
   test 'philter hybrids with an array of values without some elements' do
     search = [0, 215, 'a', 'none', :first, :none]
-    res = get_array_of_hybrids.philter search
-    assert res == [0, 'a', :first],           "Searching #{search} in #{get_array_of_hybrids} result should be [0, 'a', :first]"
+    res = get_array_of_complex_hybrids.philter search
+    assert res == [0, 'a', :first],           "Searching #{search} in #{get_array_of_complex_hybrids} result should be [0, 'a', :first]"
 
-    res = get_array_of_hybrids.philter id: [1, 215]
+    res = get_array_of_complex_hybrids.philter id: [1, 215]
     assert res.size         == 1,             "Should return one item"
-    assert res.first.is_a?(Hash),             "The item is an Hash"
+    assert res.first.is_a?(Hash),             "The item should be an Hash"
     assert res.first[:tag]  == :first,        "Should return the hash with tag=:first"
 
-    res = get_array_of_hybrids.philter id: [3, 215]
+    res = get_array_of_complex_hybrids.philter id: [3, 215]
     assert res.size         == 1,             "Should return one item"
-    assert res.first.is_a?(Employee), "The item is a Employee"
+    assert res.first.is_a?(Employee), "The item should be an Employee"
     assert res.first.tag    == 'third',       "Should return the hash with tag='third'"
+  end
+
+  test 'philter hybrids by id and get an item' do
+    res = get_array_of_complex_hybrids.philter({id: 1}, get: :tag)
+    assert res.size         == 1,             "Should return one item"
+    assert res.first.is_a?(Symbol),           "The item's field should be a symbol"
+    assert res.first        == :first,        "Should return the field tag :first"
+
+    res = get_array_of_simple_hybrids.philter({id: 1}, get: :color)
+    assert res.size         == 1,             "Should return one item"
+    assert res.first.is_a?(Symbol),           "The item's field should be a symbol"
+    assert res.first        == :red,          "Should return the field color :red"
+
+    res = get_array_of_simple_hybrids.philter({id: 2}, get: :color)
+    assert res.size         == 1,             "Should return one item"
+    assert res.first.is_a?(Symbol),           "The item's field should be a symbol"
+    assert res.first        == :yellow,       "Should return the field color :yellow"
+
+    res = get_array_of_simple_hybrids.philter({id: 4}, get: :size)
+    assert res.size         == 1,             "Should return one item"
+    assert res.first.is_a?(String),           "The item's field should be a symbol"
+    assert res.first        == '1',           "Should return the field size '1'"
+
+    # res = get_array_of_hybrids.philter id: [1, 3, 215]
+    # assert res.size         == 2,             "Should return one item"
+    # assert res.first.is_a?(Employee), "The item should be an Employee"
+    # assert res.first.tag    == 'third',       "Should return the hash with tag='third'"
   end
 
   #################
@@ -529,12 +556,12 @@ class UnitTest < Test::Unit::TestCase
     assert res.size == 1,                     "Should return 1 item, not #{res.size}"
 
     search = [0, 'a', :first]
-    res = get_array_of_hybrids.philter search, debug: true
-    assert res == search,                     "Searching #{search} in #{get_array_of_hybrids} result should be #{search}, not #{res}"
+    res = get_array_of_complex_hybrids.philter search, debug: true
+    assert res == search,                     "Searching #{search} in #{get_array_of_complex_hybrids} result should be #{search}, not #{res}"
 
-    res = get_array_of_hybrids.philter({id: [1, 2]}, debug: true)
+    res = get_array_of_complex_hybrids.philter({id: [1, 2]}, debug: true)
     assert res.size         == 2,             "Should return 2 items, not #{res.size}"
-    assert res.first.is_a?(Hash),             "The item is an Hash, not #{res.first.class.name}"
+    assert res.first.is_a?(Hash),             "The item should be an Hash, not #{res.first.class.name}"
     assert res.first[:tag]  == :first,        "Should return the hash with tag=:first, not #{res.first}"
   end
 end

@@ -97,6 +97,21 @@ end
 => :try_yourself
 ```
 
+
+Remember how to pass arguments:
+
+```ruby
+people.philter { ...filters... }, { ...options... }
+
+# YES
+[1,2,3].philter '<= 2', debug: true
+people.philter({ id: 1 }, debug: true)
+
+# NO (debug is not an attribute to filter but an option)
+people.philter(id: 1, debug: true)
+```
+
+
 Get the trace with the option `debug: true`
 
 ```ruby
@@ -294,7 +309,9 @@ select:     0.000000   0.000000   0.000000 (  0.003429)
 
 ## Compatibility
 
-Ruby `1.9+`
+Ruby `2.1+`
+
+Ruby `1.9+`  has been tested up to `v1.2.0`
 
 ## Install
 
@@ -319,7 +336,7 @@ To use it in a bundle, add to gem file `gem 'philter'` and run `bundle install`
 
 ## Testing
 
-Wide coverage with `38 unit tests` and `143 assertions`
+Wide coverage with `39 unit tests` and `155 assertions`
 
 To test locally install the development requirements
 
@@ -327,11 +344,11 @@ To test locally install the development requirements
 
 Then execute
 
-    bundle exec ruby test\unit_test.rb
+    bundle exec ruby test/unit_test.rb
 
 Performance tests are calibrated to not exceed 1.2 seconds on my pc with a tolerance become 2 seconds:
 
-    bundle exec ruby test\performance_test.rb
+    bundle exec ruby test/performance_test.rb
 
 ```
 Loaded suite test/performance_test
@@ -350,7 +367,7 @@ Finished in 8.505 seconds.
 
 If you have a very slow pc it could not pass. In this case you can pass a higher tolerance value as argument, for example 3 seconds:
 
-    bundle exec ruby test\performance_test.rb 3.0
+    bundle exec ruby test/performance_test.rb 3.0
 
 ## Found a bug?
 

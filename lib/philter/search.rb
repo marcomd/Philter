@@ -92,10 +92,10 @@ module Philter
 
         next unless selected
         results <<
-          if options[:get] && item.respond_to?(options[:get])
-            item.send options[:get]
-          elsif options[:get] && item.respond_to?('[]')
+          if options[:get] && item.respond_to?('[]')
             item[options[:get]]
+          elsif options[:get] && item.respond_to?(options[:get])
+            item.send options[:get]
           else
             item
           end
